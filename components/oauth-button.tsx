@@ -1,6 +1,6 @@
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-type OAuthProvider = 'google' | 'apple';
+type OAuthProvider = 'google' | 'github' | 'discord';
 
 interface OAuthButtonProps {
   provider: OAuthProvider;
@@ -14,13 +14,20 @@ const providerConfig = {
     backgroundColor: '#FFFFFF',
     textColor: '#1F2937',
     borderColor: '#E5E7EB',
-    icon: '🔷',
+    icon: '',
   },
-  apple: {
-    label: 'Continue with Apple',
-    backgroundColor: '#000000',
+  github: {
+    label: 'Continue with GitHub',
+    backgroundColor: '#111827',
     textColor: '#FFFFFF',
-    borderColor: '#000000',
+    borderColor: '#111827',
+    icon: '',
+  },
+  discord: {
+    label: 'Continue with Discord',
+    backgroundColor: '#5865F2',
+    textColor: '#FFFFFF',
+    borderColor: '#5865F2',
     icon: '',
   },
 };

@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { Platform, StyleSheet, Text, View, ActivityIndicator, SafeAreaView } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { OAuthButton } from '@/components/oauth-button';
+import { StatusBar } from 'expo-status-bar';
+import { useState } from 'react';
+import { ActivityIndicator, Platform, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
 export default function AuthScreen() {
   const [loading, setLoading] = useState(false);
-  const [loadingProvider, setLoadingProvider] = useState<'google' | 'apple' | null>(null);
+  const [loadingProvider, setLoadingProvider] = useState<'google' | 'github' | 'discord' | null>(null);
 
   const handleGoogleAuth = async () => {
     setLoading(true);
@@ -17,9 +17,19 @@ export default function AuthScreen() {
     setLoadingProvider(null);
   };
 
-  const handleAppleAuth = async () => {
+  const handleGithubAuth = async () => {
     setLoading(true);
-    setLoadingProvider('apple');
+    setLoadingProvider('github');
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    setLoading(false);
+    setLoadingProvider(null);
+  };
+
+  const handleDiscordAuth = async () => {
+    setLoading(true);
+    setLoadingProvider('discord');
 
     await new Promise(resolve => setTimeout(resolve, 2000));
 
@@ -35,7 +45,11 @@ export default function AuthScreen() {
           <ActivityIndicator size="large" color="#3B82F6" />
           <Text style={styles.loadingText}>Securely connecting...</Text>
           <Text style={styles.loadingSubtext}>
-            {loadingProvider === 'google' ? 'Authenticating with Google' : 'Authenticating with Apple'}
+            {loadingProvider === 'google'
+              ? 'Authenticating with Google'
+              : loadingProvider === 'github'
+                ? 'Authenticating with GitHub'
+                : 'Authenticating with Discord'}
           </Text>
         </View>
       </SafeAreaView>
@@ -45,7 +59,7 @@ export default function AuthScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="dark" />
-      <View style={styles.content}>
+      <View style={[styles.content, Platform.OS === 'web' && styles.contentWeb]}>
         <View style={styles.header}>
           <View style={styles.logoContainer}>
             <View style={styles.logo}>
@@ -56,20 +70,24 @@ export default function AuthScreen() {
           <Text style={styles.tagline}>Build habits that actually last.</Text>
         </View>
 
-        <View style={styles.authButtons}>
+        <View style={[styles.authButtons, Platform.OS === 'web' && styles.authButtonsWeb]}>
           <OAuthButton
             provider="google"
             onPress={handleGoogleAuth}
             loading={loading && loadingProvider === 'google'}
           />
 
-          {Platform.OS === 'ios' && (
-            <OAuthButton
-              provider="apple"
-              onPress={handleAppleAuth}
-              loading={loading && loadingProvider === 'apple'}
-            />
-          )}
+          <OAuthButton
+            provider="github"
+            onPress={handleGithubAuth}
+            loading={loading && loadingProvider === 'github'}
+          />
+
+          <OAuthButton
+            provider="discord"
+            onPress={handleDiscordAuth}
+            loading={loading && loadingProvider === 'discord'}
+          />
         </View>
 
         <View style={styles.footer}>
@@ -93,6 +111,11 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 40,
     justifyContent: 'space-between',
+  },
+  contentWeb: {
+    width: '100%',
+    maxWidth: 560,
+    alignSelf: 'center',
   },
   header: {
     alignItems: 'center',
@@ -137,6 +160,9 @@ const styles = StyleSheet.create({
   authButtons: {
     gap: 16,
     paddingHorizontal: 8,
+  },
+  authButtonsWeb: {
+    paddingHorizontal: 0,
   },
   footer: {
     alignItems: 'center',
