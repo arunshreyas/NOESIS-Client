@@ -1,11 +1,24 @@
 import { OAuthButton } from '@/components/oauth-button';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
-import { ActivityIndicator, Platform, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { useState, useMemo } from 'react';
+import { ActivityIndicator, Platform, SafeAreaView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
 export default function AuthScreen() {
+  const { width } = useWindowDimensions();
+  const isWeb = Platform.OS === 'web';
+  const isLargeScreen = width > 900;
   const [loading, setLoading] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState<'google' | 'github' | 'discord' | null>(null);
+
+  const layoutConfig = useMemo(() => {
+    if (!isWeb) {
+      return { logoSize: 72, appNameSize: 32, taglineSize: 17, headerGap: 40 };
+    }
+    if (isLargeScreen) {
+      return { logoSize: 96, appNameSize: 40, taglineSize: 18, headerGap: 60 };
+    }
+    return { logoSize: 80, appNameSize: 36, taglineSize: 18, headerGap: 48 };
+  }, [isWeb, isLargeScreen]);
 
   const handleGoogleAuth = async () => {
     setLoading(true);
@@ -59,38 +72,52 @@ export default function AuthScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="dark" />
-      <View style={[styles.content, Platform.OS === 'web' && styles.contentWeb]}>
-        <View style={styles.header}>
-          <View style={styles.logoContainer}>
-            <View style={styles.logo}>
-              <Text style={styles.logoText}>N</Text>
+      <View style={[styles.content, isWeb && styles.contentWeb]}>
+        <View style={[styles.headerWrapper, isWeb && styles.headerWrapperWeb]}>
+          <View style={styles.header}>
+            <View style={styles.logoContainer}>
+              <View
+                style={[
+                  styles.logo,
+                  {
+                    width: layoutConfig.logoSize,
+                    height: layoutConfig.logoSize,
+                    borderRadius: layoutConfig.logoSize * 0.28,
+                  },
+                ]}>
+                <Text style={[styles.logoText, { fontSize: layoutConfig.logoSize * 0.5 }]}>N</Text>
+              </View>
             </View>
+            <Text style={[styles.appName, { fontSize: layoutConfig.appNameSize }]}>Noesis</Text>
+            <Text style={[styles.tagline, { fontSize: layoutConfig.taglineSize, marginTop: layoutConfig.headerGap * 0.15 }]}>
+              Build habits that actually last.
+            </Text>
           </View>
-          <Text style={styles.appName}>Noesis</Text>
-          <Text style={styles.tagline}>Build habits that actually last.</Text>
         </View>
 
-        <View style={[styles.authButtons, Platform.OS === 'web' && styles.authButtonsWeb]}>
-          <OAuthButton
-            provider="google"
-            onPress={handleGoogleAuth}
-            loading={loading && loadingProvider === 'google'}
-          />
+        <View style={[styles.authButtonsWrapper, isWeb && isLargeScreen && styles.authButtonsWrapperLarge]}>
+          <View style={[styles.authButtons, isWeb && isLargeScreen && styles.authButtonsGrid]}>
+            <OAuthButton
+              provider="google"
+              onPress={handleGoogleAuth}
+              loading={loading && loadingProvider === 'google'}
+            />
 
-          <OAuthButton
-            provider="github"
-            onPress={handleGithubAuth}
-            loading={loading && loadingProvider === 'github'}
-          />
+            <OAuthButton
+              provider="github"
+              onPress={handleGithubAuth}
+              loading={loading && loadingProvider === 'github'}
+            />
 
-          <OAuthButton
-            provider="discord"
-            onPress={handleDiscordAuth}
-            loading={loading && loadingProvider === 'discord'}
-          />
+            <OAuthButton
+              provider="discord"
+              onPress={handleDiscordAuth}
+              loading={loading && loadingProvider === 'discord'}
+            />
+          </View>
         </View>
 
-        <View style={styles.footer}>
+        <View style={[styles.footer, isWeb && styles.footerWeb]}>
           <Text style={styles.footerText}>
             No passwords. No tracking.{'\n'}You stay in control.
           </Text>
@@ -111,23 +138,29 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 40,
     justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
   },
   contentWeb: {
+    maxWidth: 1200,
+    paddingTop: 80,
+    paddingBottom: 60,
+  },
+  headerWrapper: {
     width: '100%',
-    maxWidth: 560,
-    alignSelf: 'center',
+    maxWidth: 500,
+  },
+  headerWrapperWeb: {
+    marginBottom: 48,
   },
   header: {
     alignItems: 'center',
-    paddingTop: 40,
+    paddingTop: 0,
   },
   logoContainer: {
     marginBottom: 24,
   },
   logo: {
-    width: 72,
-    height: 72,
-    borderRadius: 20,
     backgroundColor: '#3B82F6',
     justifyContent: 'center',
     alignItems: 'center',
@@ -138,35 +171,50 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   logoText: {
-    fontSize: 36,
     fontWeight: '700',
     color: '#FFFFFF',
     letterSpacing: -0.5,
   },
   appName: {
-    fontSize: 32,
     fontWeight: '700',
     color: '#111827',
     marginBottom: 12,
     letterSpacing: -0.5,
   },
   tagline: {
-    fontSize: 17,
     color: '#6B7280',
     textAlign: 'center',
     lineHeight: 24,
     fontWeight: '400',
   },
+  authButtonsWrapper: {
+    width: '100%',
+    maxWidth: 500,
+    alignItems: 'center',
+  },
+  authButtonsWrapperLarge: {
+    maxWidth: '100%',
+  },
   authButtons: {
     gap: 16,
     paddingHorizontal: 8,
+    width: '100%',
   },
-  authButtonsWeb: {
+  authButtonsGrid: {
+    flexDirection: 'row',
+    gap: 20,
     paddingHorizontal: 0,
+    maxWidth: 600,
+    justifyContent: 'center',
   },
   footer: {
     alignItems: 'center',
     paddingTop: 24,
+    width: '100%',
+    maxWidth: 500,
+  },
+  footerWeb: {
+    marginTop: 32,
   },
   footerText: {
     fontSize: 14,
