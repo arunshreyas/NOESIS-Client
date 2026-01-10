@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 
-export default function LoginPage() {
+export default function SignUpPage() {
   const router = useRouter();
   return (
     <SafeAreaView style={styles.screen}>
@@ -19,12 +19,12 @@ export default function LoginPage() {
 
       <View style={styles.center}>
         <Text style={styles.logo}>Noesis</Text>
-        <Text style={styles.tagline}>Smart habit tracking, simplified.</Text>
+        <Text style={styles.tagline}>Build better habits with intention.</Text>
 
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Welcome back</Text>
+          <Text style={styles.cardTitle}>Create your account</Text>
           <Text style={styles.cardSubtitle}>
-            Sign in to sync your habits across devices
+            Create an account to save and sync your habit progress
           </Text>
 
           <View style={styles.buttons}>
@@ -34,13 +34,17 @@ export default function LoginPage() {
             <View style={styles.spacer} />
             <OAuthButton provider="discord" onPress={() => {}} />
           </View>
+
+          <Text style={styles.tos}>
+            By creating an account you agree to our Terms.
+          </Text>
         </View>
 
         <TouchableOpacity
-          onPress={() => router.push("/signupPage")}
+          onPress={() => router.push("/loginPage")}
           activeOpacity={0.8}
         >
-          <Text style={styles.footer}>Don’t have an account? Create one</Text>
+          <Text style={styles.footer}>Already have an account? Sign in</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -100,6 +104,12 @@ const styles = StyleSheet.create({
   },
   spacer: {
     height: 12,
+  },
+  tos: {
+    marginTop: 12,
+    fontSize: 12,
+    color: "#94A3B8",
+    textAlign: "center",
   },
   footer: {
     fontSize: 12,
